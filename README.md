@@ -2,72 +2,186 @@ getNCleanDataCrsProj
 ====================
 Course Project Repo for "Getting and Cleaning Data"
 ===================================================
-The run_analysis.R script in this repo is designed to operate on the Samsung data set (see the README from that data set at the bottom of this file including the license info for use of that data).  The script loads the "stringr" package as its "str_trim" function will be used later.  It then reads in the "features.txt" file of the data set and performs a gsub on the column with the feature names to convert them all to lower case and remove any non-alphanumeric characters for ease of regex application and to prevent typos.  The x,y, and subject files for the test and train file sets are then loaded using read.table with column names assigned manually or using the lower case version of the feature names from the features.txt file.  The data frames from the reading in of the x,y, and subject files are then combined using cbind resulting in 2 dataframes, one for the test data and one for the train data.  These 2 data frames are then merged using merge and the setting "all=T" to ensure that all elements from both tables are captured.  Then using grepl, the feature names are identified that contain the terms "mean" or "std" and merged into a single dataframe.  The feature numbers which are equivalent to the column numbers in the merged test/train data frame for the mean/std columns are then increased by 2 to account for the 2 columns that were cbinded in earlier: label and subject.  These adjusted numbers are then combined into a vector with the numbers 1 and 2 at the beginning of the vector.  This will then be used to subset the columns of the merged dataset so that only the desired columns pertaining to means or standard deviations and the activity id and label remain.  Some memory cleanup is then conducted on unneeded variables.  
+The run_analysis.R script in this repo is designed to operate on the Samsung data set (see the README from that data set at the bottom of this file including the license info for use of that data).  The script loads the "stringr" package as its "str_trim" function will be used later.  It then reads in the "features.txt" file of the data set and performs a gsub on the column with the feature names to convert them all to lower case and remove any non-alphanumeric characters for ease of regex application and to prevent typos.  The x,y, and subject files for the test and train file sets are then loaded using read.table with column names assigned manually or using the lower case version of the feature names from the features.txt file.  The data frames from the reading in of the x,y, and subject files are then combined using cbind resulting in 2 dataframes, one for the test data and one for the train data.  These 2 data frames are then merged using merge and the setting "all=T" to ensure that all elements from both tables are captured.  Then using grepl, the feature names are identified that contain the terms "mean" or "std" and merged into a single dataframe.  The feature numbers which are equivalent to the column numbers in the merged test/train data frame for the mean/std columns are then increased by 2 to account for the 2 columns that were cbinded in earlier: label and subject.  These adjusted numbers are then combined into a vector with the numbers 1 and 2 at the beginning of the vector.  This will then be used to subset the columns of the merged dataset so that only the desired columns pertaining to means or standard deviations and the activity id and label remain.  Some memory cleanup is then conducted on unneeded variables.  The activity_labels file is then loaded with read.table and a function is used with lapply to append a column onto the merged data set where each value in that column is the name for the activity the person was doing when the measurement was taken.  
 
 
 
 CODEBOOK
-> names(final)
-  [1] "subjectid"                                "activityid"                               "activityidAVERAGE"                       
-  [4] "tbodyaccmeanxAVERAGE"                     "tbodyaccmeanyAVERAGE"                     "tbodyaccmeanzAVERAGE"                    
-  [7] "tbodyaccstdxAVERAGE"                      "tbodyaccstdyAVERAGE"                      "tbodyaccstdzAVERAGE"                     
- [10] "tgravityaccmeanxAVERAGE"                  "tgravityaccmeanyAVERAGE"                  "tgravityaccmeanzAVERAGE"                 
- [13] "tgravityaccstdxAVERAGE"                   "tgravityaccstdyAVERAGE"                   "tgravityaccstdzAVERAGE"                  
- [16] "tbodyaccjerkmeanxAVERAGE"                 "tbodyaccjerkmeanyAVERAGE"                 "tbodyaccjerkmeanzAVERAGE"                
- [19] "tbodyaccjerkstdxAVERAGE"                  "tbodyaccjerkstdyAVERAGE"                  "tbodyaccjerkstdzAVERAGE"                 
- [22] "tbodygyromeanxAVERAGE"                    "tbodygyromeanyAVERAGE"                    "tbodygyromeanzAVERAGE"                   
- [25] "tbodygyrostdxAVERAGE"                     "tbodygyrostdyAVERAGE"                     "tbodygyrostdzAVERAGE"                    
- [28] "tbodygyrojerkmeanxAVERAGE"                "tbodygyrojerkmeanyAVERAGE"                "tbodygyrojerkmeanzAVERAGE"               
- [31] "tbodygyrojerkstdxAVERAGE"                 "tbodygyrojerkstdyAVERAGE"                 "tbodygyrojerkstdzAVERAGE"                
- [34] "tbodyaccmagmeanAVERAGE"                   "tbodyaccmagstdAVERAGE"                    "tgravityaccmagmeanAVERAGE"               
- [37] "tgravityaccmagstdAVERAGE"                 "tbodyaccjerkmagmeanAVERAGE"               "tbodyaccjerkmagstdAVERAGE"               
- [40] "tbodygyromagmeanAVERAGE"                  "tbodygyromagstdAVERAGE"                   "tbodygyrojerkmagmeanAVERAGE"             
- [43] "tbodygyrojerkmagstdAVERAGE"               "fbodyaccmeanxAVERAGE"                     "fbodyaccmeanyAVERAGE"                    
- [46] "fbodyaccmeanzAVERAGE"                     "fbodyaccstdxAVERAGE"                      "fbodyaccstdyAVERAGE"                     
- [49] "fbodyaccstdzAVERAGE"                      "fbodyaccmeanfreqxAVERAGE"                 "fbodyaccmeanfreqyAVERAGE"                
- [52] "fbodyaccmeanfreqzAVERAGE"                 "fbodyaccjerkmeanxAVERAGE"                 "fbodyaccjerkmeanyAVERAGE"                
- [55] "fbodyaccjerkmeanzAVERAGE"                 "fbodyaccjerkstdxAVERAGE"                  "fbodyaccjerkstdyAVERAGE"                 
- [58] "fbodyaccjerkstdzAVERAGE"                  "fbodyaccjerkmeanfreqxAVERAGE"             "fbodyaccjerkmeanfreqyAVERAGE"            
- [61] "fbodyaccjerkmeanfreqzAVERAGE"             "fbodygyromeanxAVERAGE"                    "fbodygyromeanyAVERAGE"                   
- [64] "fbodygyromeanzAVERAGE"                    "fbodygyrostdxAVERAGE"                     "fbodygyrostdyAVERAGE"                    
- [67] "fbodygyrostdzAVERAGE"                     "fbodygyromeanfreqxAVERAGE"                "fbodygyromeanfreqyAVERAGE"               
- [70] "fbodygyromeanfreqzAVERAGE"                "fbodyaccmagmeanAVERAGE"                   "fbodyaccmagstdAVERAGE"                   
- [73] "fbodyaccmagmeanfreqAVERAGE"               "fbodybodyaccjerkmagmeanAVERAGE"           "fbodybodyaccjerkmagstdAVERAGE"           
- [76] "fbodybodyaccjerkmagmeanfreqAVERAGE"       "fbodybodygyromagmeanAVERAGE"              "fbodybodygyromagstdAVERAGE"              
- [79] "fbodybodygyromagmeanfreqAVERAGE"          "fbodybodygyrojerkmagmeanAVERAGE"          "fbodybodygyrojerkmagstdAVERAGE"          
- [82] "fbodybodygyrojerkmagmeanfreqAVERAGE"      "angletbodyaccmeangravityAVERAGE"          "angletbodyaccjerkmeangravitymeanAVERAGE" 
- [85] "angletbodygyromeangravitymeanAVERAGE"     "angletbodygyrojerkmeangravitymeanAVERAGE" "anglexgravitymeanAVERAGE"                
- [88] "angleygravitymeanAVERAGE"                 "anglezgravitymeanAVERAGE"                 "activityidSTDEV"                         
- [91] "tbodyaccmeanxSTDEV"                       "tbodyaccmeanySTDEV"                       "tbodyaccmeanzSTDEV"                      
- [94] "tbodyaccstdxSTDEV"                        "tbodyaccstdySTDEV"                        "tbodyaccstdzSTDEV"                       
- [97] "tgravityaccmeanxSTDEV"                    "tgravityaccmeanySTDEV"                    "tgravityaccmeanzSTDEV"                   
-[100] "tgravityaccstdxSTDEV"                     "tgravityaccstdySTDEV"                     "tgravityaccstdzSTDEV"                    
-[103] "tbodyaccjerkmeanxSTDEV"                   "tbodyaccjerkmeanySTDEV"                   "tbodyaccjerkmeanzSTDEV"                  
-[106] "tbodyaccjerkstdxSTDEV"                    "tbodyaccjerkstdySTDEV"                    "tbodyaccjerkstdzSTDEV"                   
-[109] "tbodygyromeanxSTDEV"                      "tbodygyromeanySTDEV"                      "tbodygyromeanzSTDEV"                     
-[112] "tbodygyrostdxSTDEV"                       "tbodygyrostdySTDEV"                       "tbodygyrostdzSTDEV"                      
-[115] "tbodygyrojerkmeanxSTDEV"                  "tbodygyrojerkmeanySTDEV"                  "tbodygyrojerkmeanzSTDEV"                 
-[118] "tbodygyrojerkstdxSTDEV"                   "tbodygyrojerkstdySTDEV"                   "tbodygyrojerkstdzSTDEV"                  
-[121] "tbodyaccmagmeanSTDEV"                     "tbodyaccmagstdSTDEV"                      "tgravityaccmagmeanSTDEV"                 
-[124] "tgravityaccmagstdSTDEV"                   "tbodyaccjerkmagmeanSTDEV"                 "tbodyaccjerkmagstdSTDEV"                 
-[127] "tbodygyromagmeanSTDEV"                    "tbodygyromagstdSTDEV"                     "tbodygyrojerkmagmeanSTDEV"               
-[130] "tbodygyrojerkmagstdSTDEV"                 "fbodyaccmeanxSTDEV"                       "fbodyaccmeanySTDEV"                      
-[133] "fbodyaccmeanzSTDEV"                       "fbodyaccstdxSTDEV"                        "fbodyaccstdySTDEV"                       
-[136] "fbodyaccstdzSTDEV"                        "fbodyaccmeanfreqxSTDEV"                   "fbodyaccmeanfreqySTDEV"                  
-[139] "fbodyaccmeanfreqzSTDEV"                   "fbodyaccjerkmeanxSTDEV"                   "fbodyaccjerkmeanySTDEV"                  
-[142] "fbodyaccjerkmeanzSTDEV"                   "fbodyaccjerkstdxSTDEV"                    "fbodyaccjerkstdySTDEV"                   
-[145] "fbodyaccjerkstdzSTDEV"                    "fbodyaccjerkmeanfreqxSTDEV"               "fbodyaccjerkmeanfreqySTDEV"              
-[148] "fbodyaccjerkmeanfreqzSTDEV"               "fbodygyromeanxSTDEV"                      "fbodygyromeanySTDEV"                     
-[151] "fbodygyromeanzSTDEV"                      "fbodygyrostdxSTDEV"                       "fbodygyrostdySTDEV"                      
-[154] "fbodygyrostdzSTDEV"                       "fbodygyromeanfreqxSTDEV"                  "fbodygyromeanfreqySTDEV"                 
-[157] "fbodygyromeanfreqzSTDEV"                  "fbodyaccmagmeanSTDEV"                     "fbodyaccmagstdSTDEV"                     
-[160] "fbodyaccmagmeanfreqSTDEV"                 "fbodybodyaccjerkmagmeanSTDEV"             "fbodybodyaccjerkmagstdSTDEV"             
-[163] "fbodybodyaccjerkmagmeanfreqSTDEV"         "fbodybodygyromagmeanSTDEV"                "fbodybodygyromagstdSTDEV"                
-[166] "fbodybodygyromagmeanfreqSTDEV"            "fbodybodygyrojerkmagmeanSTDEV"            "fbodybodygyrojerkmagstdSTDEV"            
-[169] "fbodybodygyrojerkmagmeanfreqSTDEV"        "angletbodyaccmeangravitySTDEV"            "angletbodyaccjerkmeangravitymeanSTDEV"   
-[172] "angletbodygyromeangravitymeanSTDEV"       "angletbodygyrojerkmeangravitymeanSTDEV"   "anglexgravitymeanSTDEV"                  
-[175] "angleygravitymeanSTDEV"                   "anglezgravitymeanSTDEV"
-
+subjectid - The id numbers between 1 and 30 for the subjects in the study.
+activityid - the name of the activity the subject was undertaking when the measurement was taken.
+tbodyaccmeanxAVERAGE
+tbodyaccmeanyAVERAGE
+tbodyaccmeanzAVERAGE                    
+tbodyaccstdxAVERAGE
+tbodyaccstdyAVERAGE
+tbodyaccstdzAVERAGE                     
+tgravityaccmeanxAVERAGE
+tgravityaccmeanyAVERAGE
+tgravityaccmeanzAVERAGE                 
+tgravityaccstdxAVERAGE
+tgravityaccstdyAVERAGE
+tgravityaccstdzAVERAGE                  
+tbodyaccjerkmeanxAVERAGE
+tbodyaccjerkmeanyAVERAGE
+tbodyaccjerkmeanzAVERAGE                
+tbodyaccjerkstdxAVERAGE
+tbodyaccjerkstdyAVERAGE
+tbodyaccjerkstdzAVERAGE                 
+tbodygyromeanxAVERAGE
+tbodygyromeanyAVERAGE
+tbodygyromeanzAVERAGE                   
+tbodygyrostdxAVERAGE
+tbodygyrostdyAVERAGE
+tbodygyrostdzAVERAGE                    
+tbodygyrojerkmeanxAVERAGE
+tbodygyrojerkmeanyAVERAGE
+tbodygyrojerkmeanzAVERAGE               
+tbodygyrojerkstdxAVERAGE
+tbodygyrojerkstdyAVERAGE
+tbodygyrojerkstdzAVERAGE                
+tbodyaccmagmeanAVERAGE
+tbodyaccmagstdAVERAGE
+tgravityaccmagmeanAVERAGE               
+tgravityaccmagstdAVERAGE
+tbodyaccjerkmagmeanAVERAGE
+tbodyaccjerkmagstdAVERAGE               
+tbodygyromagmeanAVERAGE
+tbodygyromagstdAVERAGE
+tbodygyrojerkmagmeanAVERAGE             
+tbodygyrojerkmagstdAVERAGE
+fbodyaccmeanxAVERAGE
+fbodyaccmeanyAVERAGE                    
+fbodyaccmeanzAVERAGE
+fbodyaccstdxAVERAGE
+fbodyaccstdyAVERAGE                     
+fbodyaccstdzAVERAGE
+fbodyaccmeanfreqxAVERAGE
+fbodyaccmeanfreqyAVERAGE                
+fbodyaccmeanfreqzAVERAGE
+fbodyaccjerkmeanxAVERAGE
+fbodyaccjerkmeanyAVERAGE                
+fbodyaccjerkmeanzAVERAGE
+fbodyaccjerkstdxAVERAGE
+fbodyaccjerkstdyAVERAGE                 
+fbodyaccjerkstdzAVERAGE
+fbodyaccjerkmeanfreqxAVERAGE
+fbodyaccjerkmeanfreqyAVERAGE            
+fbodyaccjerkmeanfreqzAVERAGE
+fbodygyromeanxAVERAGE
+fbodygyromeanyAVERAGE                   
+fbodygyromeanzAVERAGE
+fbodygyrostdxAVERAGE
+fbodygyrostdyAVERAGE                    
+fbodygyrostdzAVERAGE
+fbodygyromeanfreqxAVERAGE
+fbodygyromeanfreqyAVERAGE               
+fbodygyromeanfreqzAVERAGE
+fbodyaccmagmeanAVERAGE
+fbodyaccmagstdAVERAGE                   
+fbodyaccmagmeanfreqAVERAGE
+fbodybodyaccjerkmagmeanAVERAGE
+fbodybodyaccjerkmagstdAVERAGE           
+fbodybodyaccjerkmagmeanfreqAVERAGE
+fbodybodygyromagmeanAVERAGE
+fbodybodygyromagstdAVERAGE              
+fbodybodygyromagmeanfreqAVERAGE
+fbodybodygyrojerkmagmeanAVERAGE
+fbodybodygyrojerkmagstdAVERAGE          
+fbodybodygyrojerkmagmeanfreqAVERAGE
+angletbodyaccmeangravityAVERAGE
+angletbodyaccjerkmeangravitymeanAVERAGE 
+angletbodygyromeangravitymeanAVERAGE
+angletbodygyrojerkmeangravitymeanAVERAGE
+anglexgravitymeanAVERAGE                
+angleygravitymeanAVERAGE
+anglezgravitymeanAVERAGE
+activityidSTDEV                         
+tbodyaccmeanxSTDEV
+tbodyaccmeanySTDEV
+tbodyaccmeanzSTDEV                      
+tbodyaccstdxSTDEV
+tbodyaccstdySTDEV
+tbodyaccstdzSTDEV                       
+tgravityaccmeanxSTDEV
+tgravityaccmeanySTDEV
+tgravityaccmeanzSTDEV                   
+tgravityaccstdxSTDEV
+tgravityaccstdySTDEV
+tgravityaccstdzSTDEV                    
+tbodyaccjerkmeanxSTDEV
+tbodyaccjerkmeanySTDEV
+tbodyaccjerkmeanzSTDEV                  
+tbodyaccjerkstdxSTDEV
+tbodyaccjerkstdySTDEV
+tbodyaccjerkstdzSTDEV                   
+tbodygyromeanxSTDEV
+tbodygyromeanySTDEV
+tbodygyromeanzSTDEV                     
+tbodygyrostdxSTDEV
+tbodygyrostdySTDEV
+tbodygyrostdzSTDEV                      
+tbodygyrojerkmeanxSTDEV
+tbodygyrojerkmeanySTDEV
+tbodygyrojerkmeanzSTDEV                 
+tbodygyrojerkstdxSTDEV
+tbodygyrojerkstdySTDEV
+tbodygyrojerkstdzSTDEV                  
+tbodyaccmagmeanSTDEV
+tbodyaccmagstdSTDEV
+tgravityaccmagmeanSTDEV                 
+tgravityaccmagstdSTDEV
+tbodyaccjerkmagmeanSTDEV
+tbodyaccjerkmagstdSTDEV                 
+tbodygyromagmeanSTDEV
+tbodygyromagstdSTDEV
+tbodygyrojerkmagmeanSTDEV               
+tbodygyrojerkmagstdSTDEV
+fbodyaccmeanxSTDEV
+fbodyaccmeanySTDEV                      
+fbodyaccmeanzSTDEV
+fbodyaccstdxSTDEV
+fbodyaccstdySTDEV                       
+fbodyaccstdzSTDEV
+fbodyaccmeanfreqxSTDEV
+fbodyaccmeanfreqySTDEV                  
+fbodyaccmeanfreqzSTDEV
+fbodyaccjerkmeanxSTDEV
+fbodyaccjerkmeanySTDEV                  
+fbodyaccjerkmeanzSTDEV
+fbodyaccjerkstdxSTDEV
+fbodyaccjerkstdySTDEV                   
+fbodyaccjerkstdzSTDEV
+fbodyaccjerkmeanfreqxSTDEV
+fbodyaccjerkmeanfreqySTDEV              
+fbodyaccjerkmeanfreqzSTDEV
+fbodygyromeanxSTDEV
+fbodygyromeanySTDEV                     
+fbodygyromeanzSTDEV
+fbodygyrostdxSTDEV
+fbodygyrostdySTDEV                      
+fbodygyrostdzSTDEV
+fbodygyromeanfreqxSTDEV
+fbodygyromeanfreqySTDEV                 
+fbodygyromeanfreqzSTDEV
+fbodyaccmagmeanSTDEV
+fbodyaccmagstdSTDEV                     
+fbodyaccmagmeanfreqSTDEV
+fbodybodyaccjerkmagmeanSTDEV
+fbodybodyaccjerkmagstdSTDEV             
+fbodybodyaccjerkmagmeanfreqSTDEV
+fbodybodygyromagmeanSTDEV
+fbodybodygyromagstdSTDEV                
+fbodybodygyromagmeanfreqSTDEV
+fbodybodygyrojerkmagmeanSTDEV
+fbodybodygyrojerkmagstdSTDEV            
+fbodybodygyrojerkmagmeanfreqSTDEV
+angletbodyaccmeangravitySTDEV
+angletbodyaccjerkmeangravitymeanSTDEV   
+angletbodygyromeangravitymeanSTDEV
+angletbodygyrojerkmeangravitymeanSTDEV
+anglexgravitymeanSTDEV                  
+angleygravitymeanSTDEV
+anglezgravitymeanSTDEV
 
 
 

@@ -2,7 +2,7 @@ getNCleanDataCrsProj
 ====================
 Course Project Repo for "Getting and Cleaning Data"
 ===================================================
-The run_analysis.R script in this repo is designed to operate on the Samsung data set (see the README from that data set at the bottom of this file including the license info for use of that data).  The script reads in the 
+The run_analysis.R script in this repo is designed to operate on the Samsung data set (see the README from that data set at the bottom of this file including the license info for use of that data).  The script loads the "stringr" package as its "str_trim" function will be used later.  It then reads in the "features.txt" file of the data set and performs a gsub on the column with the feature names to convert them all to lower case and remove any non-alphanumeric characters for ease of regex application and to prevent typos.  The x,y, and subject files for the test and train file sets are then loaded using read.table with column names assigned manually or using the lower case version of the feature names from the features.txt file.
 
 
 Below the following double line is the README.txt from the original Samsung data set, which is included primarily for provenance and license info.

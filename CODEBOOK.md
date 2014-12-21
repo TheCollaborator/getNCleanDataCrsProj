@@ -4,12 +4,7 @@ What follows is a description of the variables found this data set, which is a s
 subjectid - The id numbers between 1 and 30 for the subjects in the study.<br>
 activityid - the name of the activity the subject was undertaking when the measurement was taken.<br>
 
-key = acc -> acceleration
-      std -> standard deviation 
-      x,y,z -> refer to the axis the measurement pertained to
-      gyro -> gyroscopic
-      mag -> magnitude
-      (see documentation for information concerning other variables collected and for more in-depth information)
+key = acc -> acceleration<br>      std -> standard deviation<br>      x,y,z -> refer to the axis the measurement pertained to<br>      gyro -> gyroscopic<br>      mag -> magnitude<br>      (see documentation for information concerning other variables collected and for more in-depth information)
 
 tbodyaccmeanxAVERAGE<br>
 tbodyaccmeanyAVERAGE<br>

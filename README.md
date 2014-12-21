@@ -202,6 +202,7 @@ anglezgravitymeanSTDEV<br>
 
 Below the following double line is the README.txt from the original Samsung data set, which is included primarily for provenance and license info.
 ==================================================================
+==================================================================
 Human Activity Recognition Using Smartphones Dataset
 Version 1.0
 ==================================================================

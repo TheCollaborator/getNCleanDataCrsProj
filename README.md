@@ -6,7 +6,7 @@ The run_analysis.R script in this repo is designed to operate on the Samsung dat
 
 
 
-CODEBOOK
+CODEBOOK<br>
 subjectid - The id numbers between 1 and 30 for the subjects in the study.
 activityid - the name of the activity the subject was undertaking when the measurement was taken.
 tbodyaccmeanxAVERAGE

@@ -9,9 +9,6 @@ The run_analysis.R script in this repo is designed to operate on the Samsung dat
 
 <h2>CODEBOOK</h2><br>
 =====================
-subjectid - The id numbers between 1 and 30 for the subjects in the study.<br>
-activityid - the name of the activity the subject was undertaking when the measurement was taken.<br>
-
 <h3>Key</h3>
       acc -> acceleration<br>
       std -> standard deviation<br>
@@ -19,6 +16,10 @@ activityid - the name of the activity the subject was undertaking when the measu
       gyro -> gyroscopic<br>
       mag -> magnitude<br>
       (see documentation for information concerning other variables collected and for more in-depth information)<br>
+
+
+subjectid - The id numbers between 1 and 30 for the subjects in the study.<br>
+activityid - the name of the activity the subject was undertaking when the measurement was taken.<br>
 
 tbodyaccmeanxAVERAGE<br>
 tbodyaccmeanyAVERAGE<br>
